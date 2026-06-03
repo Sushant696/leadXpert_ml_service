@@ -1,0 +1,17 @@
+# local tooling
+.claude/
+
+# ml-service
+ml-service/__pycache__/
+ml-service/venv/
+
+# training
+training/leadxpert_leads.csv
+training/ml_output/
+training/__pycache__/
+
+# backend
+backend/.env
+
+# frontend
+frontend/.env.local
