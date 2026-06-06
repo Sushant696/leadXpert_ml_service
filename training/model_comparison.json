@@ -1,0 +1,144 @@
+{
+  "results": {
+    "Logistic Regression": {
+      "accuracy": 0.5875,
+      "precision": 0.4058,
+      "recall": 0.5472,
+      "f1": 0.466,
+      "auc_roc": 0.6122
+    },
+    "Random Forest": {
+      "accuracy": 0.6755,
+      "precision": 0.5288,
+      "recall": 0.1235,
+      "f1": 0.2003,
+      "auc_roc": 0.6542
+    },
+    "Random Baseline": {
+      "accuracy": 0.4996,
+      "precision": 0.3281,
+      "recall": 0.4973,
+      "f1": 0.3953,
+      "auc_roc": 0.499
+    },
+    "Rule-Based Baseline": {
+      "accuracy": 0.6743,
+      "precision": 0.5417,
+      "recall": 0.064,
+      "f1": 0.1144,
+      "auc_roc": null
+    }
+  },
+  "cv_lr": {
+    "mean": 0.7105,
+    "std": 0.0009,
+    "scores": [
+      0.7112958647223966,
+      0.7092005674947901,
+      0.71092992427909,
+      0.7097123265599323,
+      0.7113488992223989
+    ]
+  },
+  "cv_rf": {
+    "mean": 0.7733,
+    "std": 0.0009,
+    "scores": [
+      0.7741103201147561,
+      0.7722341788651014,
+      0.7729586395953514,
+      0.772862297037507,
+      0.7745594617263667
+    ]
+  },
+  "feature_importances": [
+    {
+      "feature": "stage_probability",
+      "importance": 0.250085
+    },
+    {
+      "feature": "is_rotten",
+      "importance": 0.2445
+    },
+    {
+      "feature": "lead_source",
+      "importance": 0.135062
+    },
+    {
+      "feature": "stage_index",
+      "importance": 0.113571
+    },
+    {
+      "feature": "activity_count",
+      "importance": 0.044773
+    },
+    {
+      "feature": "human_priority",
+      "importance": 0.044662
+    },
+    {
+      "feature": "lead_value",
+      "importance": 0.03976
+    },
+    {
+      "feature": "days_since_last_contact",
+      "importance": 0.036237
+    },
+    {
+      "feature": "days_in_pipeline",
+      "importance": 0.026374
+    },
+    {
+      "feature": "business_vertical",
+      "importance": 0.024897
+    },
+    {
+      "feature": "time_in_current_stage",
+      "importance": 0.015529
+    },
+    {
+      "feature": "task_count",
+      "importance": 0.009134
+    },
+    {
+      "feature": "has_upcoming_task",
+      "importance": 0.00833
+    },
+    {
+      "feature": "note_count",
+      "importance": 0.007085
+    }
+  ],
+  "best_model": "Random Forest",
+  "rf_auc_raw": 0.6545,
+  "rf_auc_calibrated": 0.6542,
+  "calibration_method": "isotonic",
+  "fresh_lead_validation": [
+    {
+      "lead_source": "REFERRAL",
+      "score": 39.3
+    },
+    {
+      "lead_source": "WALK_IN",
+      "score": 29.2
+    },
+    {
+      "lead_source": "WHATSAPP",
+      "score": 26.4
+    },
+    {
+      "lead_source": "WEBSITE",
+      "score": 28.1
+    },
+    {
+      "lead_source": "FACEBOOK",
+      "score": 21.2
+    },
+    {
+      "lead_source": "COLD_OUTREACH",
+      "score": 17.5
+    }
+  ],
+  "fresh_lead_mean_score": 26.9,
+  "test_base_rate": 0.329
+}
