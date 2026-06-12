@@ -7,6 +7,8 @@ Runs on port 5001 (internal only — not to be exposed externally).
 Endpoints:
   GET  /health         — liveness check
   GET  /features       — returns expected feature schema
+    POST /score          — score a single lead
+    POST /score/batch    — score multiple leads
 
 Run:
   python app.py                    (dev)
@@ -283,6 +285,91 @@ def features():
         "categorical_cols":  CATEGORICAL_COLS,
         "schema":            schema,
         "model":             MODEL_NAME,
+    }), 200
+
+
+@app.route("/score", methods=["POST"])
+def score_single():
+    """
+    Score a single lead.
+
+    Body: { lead_source, business_vertical, human_priority,
+            lead_value, days_in_pipeline, time_in_current_stage,
+            days_since_last_contact, activity_count, task_count,
+            note_count, stage_index, stage_probability,
+            is_rotten, has_upcoming_task }
+
+    Returns: { mlScore, mlPriority, conversionProbability,
+               model, topFeatures, scoredAt }
+    """
+    if not ARTIFACTS_LOADED:
+        return jsonify({"error": "Model artifacts not loaded"}), 503
+
+    body = request.get_json(silent=True)
+    if not body:
+        return jsonify({"error": "Request body must be JSON"}), 400
+
+    cleaned, error = validate_features(body)
+    if error:
+        return jsonify({"error": error}), 422
+
+    try:
+        result = score_features(cleaned)
+        log.info(f"Scored lead: score={result['mlScore']} priority={result['mlPriority']}")
+        return jsonify(result), 200
+    except Exception as e:
+        log.error(f"Scoring error: {e}")
+        return jsonify({"error": "Scoring failed", "detail": str(e)}), 500
+
+
+@app.route("/score/batch", methods=["POST"])
+def score_batch():
+    """
+    Score multiple leads at once.
+
+    Body: { leads: [ { ...features }, ... ] }
+
+    Returns: { results: [ { mlScore, mlPriority, ... }, ... ], count: N }
+    """
+    if not ARTIFACTS_LOADED:
+        return jsonify({"error": "Model artifacts not loaded"}), 503
+
+    body = request.get_json(silent=True)
+    if not body or "leads" not in body:
+        return jsonify({"error": "Body must be { leads: [...] }"}), 400
+
+    leads = body["leads"]
+    if not isinstance(leads, list) or len(leads) == 0:
+        return jsonify({"error": "leads must be a non-empty array"}), 400
+
+    if len(leads) > 500:
+        return jsonify({"error": "Batch size limit is 500 per request"}), 400
+
+    results = []
+    errors  = []
+
+    for i, lead in enumerate(leads):
+        lead_id = lead.get("leadId", f"index_{i}")
+        cleaned, error = validate_features(lead)
+        if error:
+            errors.append({"leadId": lead_id, "error": error})
+            results.append({"leadId": lead_id, "error": error})
+            continue
+        try:
+            result = score_features(cleaned)
+            result["leadId"] = lead_id
+            results.append(result)
+        except Exception as e:
+            errors.append({"leadId": lead_id, "error": str(e)})
+            results.append({"leadId": lead_id, "error": str(e)})
+
+    log.info(f"Batch scored {len(leads)} leads — {len(errors)} errors")
+    return jsonify({
+        "results":      results,
+        "count":        len(leads),
+        "successCount": len(leads) - len(errors),
+        "errorCount":   len(errors),
+        "scoredAt":     datetime.now(timezone.utc).isoformat(),
     }), 200
 
 
