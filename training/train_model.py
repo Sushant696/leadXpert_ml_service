@@ -143,14 +143,14 @@ lr = LogisticRegression(max_iter=1000, random_state=SEED, C=1.0)
 lr.fit(X_train_scaled, y_train_bal)
 
 # ── Random Forest
-# Initial training pass: keep class_weight balanced alongside SMOTE so the
-# model can be benchmarked before the calibration fix lands.
-print("  Training Random Forest (SMOTE-balanced, class_weight='balanced')...")
+# SMOTE already rebalances the training set to 50/50, so class_weight is left
+# unset here. Reweighting on top of SMOTE would double-count the minority class
+# and inflate the predicted probabilities.
+print("  Training Random Forest (SMOTE-balanced, no class_weight)...")
 rf = RandomForestClassifier(
     n_estimators=200,
     max_depth=12,
     min_samples_leaf=10,
-    class_weight="balanced",
     random_state=SEED,
     n_jobs=-1,
 )

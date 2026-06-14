@@ -10,6 +10,9 @@ training/leadxpert_leads.csv
 training/ml_output/
 training/__pycache__/
 
+# ml-service models
+ml-service/models/
+
 # backend
 backend/.env
 
